@@ -1,4 +1,4 @@
-package com.example.access;
+package com.zakoi.accessory.smartnotify.receiver;
 
 import java.util.List;
 

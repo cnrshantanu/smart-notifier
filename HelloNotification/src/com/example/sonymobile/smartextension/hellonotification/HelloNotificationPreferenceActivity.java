@@ -239,4 +239,30 @@ public class HelloNotificationPreferenceActivity extends PreferenceActivity {
 
         NotificationUtil.addEvent(this, eventValues);
     }
+    
+    public void addData(String name,String message) {
+        Random rand = new Random();
+        int index = rand.nextInt(5);
+        long time = System.currentTimeMillis();
+        long sourceId = NotificationUtil.getSourceId(this,
+                HelloNotificationExtensionService.EXTENSION_SPECIFIC_ID);
+        if (sourceId == NotificationUtil.INVALID_ID) {
+            Log.e(HelloNotificationExtensionService.LOG_TAG, "Failed to insert data");
+            return;
+        }
+        String profileImage = ExtensionUtils.getUriString(this,
+                R.drawable.widget_default_userpic_bg);
+
+        // Build the notification.
+        ContentValues eventValues = new ContentValues();
+        eventValues.put(Notification.EventColumns.EVENT_READ_STATUS, false);
+        eventValues.put(Notification.EventColumns.DISPLAY_NAME, name);
+        eventValues.put(Notification.EventColumns.MESSAGE, message);
+        eventValues.put(Notification.EventColumns.PERSONAL, 1);
+        eventValues.put(Notification.EventColumns.PROFILE_IMAGE_URI, profileImage);
+        eventValues.put(Notification.EventColumns.PUBLISHED_TIME, time);
+        eventValues.put(Notification.EventColumns.SOURCE_ID, sourceId);
+
+        NotificationUtil.addEvent(this, eventValues);
+    }
 }
