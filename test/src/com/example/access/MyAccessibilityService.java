@@ -30,8 +30,7 @@ public class MyAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
          
-    	Log.d("shan","shan please");
-        final int eventType = event.getEventType();
+    	final int eventType = event.getEventType();
         if (eventType == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
             final String sourcePackageName = (String)event.getPackageName();
             Parcelable parcelable = event.getParcelableData();
@@ -57,7 +56,7 @@ public class MyAccessibilityService extends AccessibilityService {
                 } else {
                     Log.e(TAG, "Notification Message is empty. Can not broadcast");
                 }
-            } else {
+            }/* else {
                 // Something else, e.g. a Toast message
                 // Read message and broadcast
                 List<CharSequence> messages = event.getText();
@@ -76,7 +75,7 @@ public class MyAccessibilityService extends AccessibilityService {
                 } else {
                     Log.e(TAG, "Message is empty. Can not broadcast");
                 }
-            }
+            }*/
         } else {
             Log.v(TAG, "Got un-handled Event");
         }
@@ -100,11 +99,11 @@ public class MyAccessibilityService extends AccessibilityService {
                 //{"com.appone.totest.accessibility", "com.apptwo.totest.accessibility"};
  
        // Set the type of feedback your service will provide.
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             info.feedbackType = AccessibilityServiceInfo.FEEDBACK_ALL_MASK;
- //       } else {
-   //         info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
-    //    }      
+       } else {
+    	   info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
+       }      
 
         // Default services are invoked only if no package-specific ones are present
         // for the type of AccessibilityEvent generated.  This service *is*
