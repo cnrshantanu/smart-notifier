@@ -22,6 +22,7 @@ import com.zakoi.accessory.smartnotify.receiver.MyAccessibilityService.Constants
 public class ToastOrNotificationTestActivity extends Activity {
  
     private static final String TAG = "ToastOrNotificationTestActivity";
+    private static PackageGrabber m_packageGrabber;
      
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,8 @@ public class ToastOrNotificationTestActivity extends Activity {
         mIntentFilter.addAction(Constants.ACTION_CATCH_TOAST);
         registerReceiver(toastOrNotificationCatcherReceiver, mIntentFilter);
         Log.v(TAG, "Receiver registered.");
+        m_packageGrabber = new PackageGrabber(getApplicationContext());
+        m_packageGrabber.getPackages();
     }
              
     @Override
