@@ -225,7 +225,7 @@ public class HelloNotificationPreferenceActivity extends PreferenceActivity {
             return;
         }
         String profileImage = ExtensionUtils.getUriString(this,
-                R.drawable.widget_default_userpic_bg);
+                R.drawable.headset_pro_ok_icn);
 
         // Build the notification.
         ContentValues eventValues = new ContentValues();
