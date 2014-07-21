@@ -38,9 +38,7 @@ public class MyAccessibilityService extends AccessibilityService {
              
             if (parcelable instanceof Notification) {
                 // Statusbar Notification
-                 
-                //Notification notification = (Notification) parcelable;
-                //Log.e(TAG, "Notification -> notification.tickerText :: " + notification.tickerText);
+               
                 List<CharSequence> messages = event.getText();
                 if (messages.size() > 0) {
                     final String notificationMsg = messages.get(0).toString();                       
@@ -57,26 +55,7 @@ public class MyAccessibilityService extends AccessibilityService {
                 } else {
                     Log.e(TAG, "Notification Message is empty. Can not broadcast");
                 }
-            } /*else {
-                // Something else, e.g. a Toast message
-                // Read message and broadcast
-                List<CharSequence> messages = event.getText();
-                if (messages.size() > 0) {
-                    final String toastMsg = (String) messages.get(0);                      
-                    Log.v(TAG, "Captured message [" + toastMsg + "] for source [" + sourcePackageName + "]");                  
-                    Log.v(TAG, "Broadcasting for " + Constants.ACTION_CATCH_TOAST);
-                    try {
-                        Intent mIntent = new Intent(Constants.ACTION_CATCH_TOAST);
-                        mIntent.putExtra(Constants.EXTRA_PACKAGE, sourcePackageName);
-                        mIntent.putExtra(Constants.EXTRA_MESSAGE, toastMsg);
-                        MyAccessibilityService.this.getApplicationContext().sendBroadcast(mIntent);
-                    } catch (Exception e) {
-                         Log.v(TAG, e.toString());
-                    }
-                } else {
-                    Log.e(TAG, "Message is empty. Can not broadcast");
-                }
-            }*/
+            }        
         } else {
             Log.v(TAG, "Got un-handled Event");
         }

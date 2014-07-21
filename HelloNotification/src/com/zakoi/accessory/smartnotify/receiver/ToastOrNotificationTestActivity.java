@@ -57,6 +57,7 @@ public class ToastOrNotificationTestActivity extends Activity {
         	
         	String profileImage;
             ApplicationInfo appInfo;
+            String app_name;
 	        appInfo = this.getPackageManager().getApplicationInfo(package_name, 0);
 	        if(appInfo.icon != 0) {
 	             Uri icon_uri = Uri.parse("android.resource://" + package_name + "/" + appInfo.icon);
@@ -64,10 +65,11 @@ public class ToastOrNotificationTestActivity extends Activity {
 	        } else
 	        	profileImage = ExtensionUtils.getUriString(this,
 	                    R.drawable.widget_default_userpic_bg);
+	        app_name = appInfo.loadLabel(getPackageManager()).toString();
 		    // Build the notification.
 	        ContentValues eventValues = new ContentValues();
 	        eventValues.put(Notification.EventColumns.EVENT_READ_STATUS, false);
-	        eventValues.put(Notification.EventColumns.DISPLAY_NAME, appInfo.name);
+	        eventValues.put(Notification.EventColumns.DISPLAY_NAME, app_name);
 	        eventValues.put(Notification.EventColumns.MESSAGE, message);
 	        eventValues.put(Notification.EventColumns.PERSONAL, 1);
 	        eventValues.put(Notification.EventColumns.PROFILE_IMAGE_URI,profileImage);
