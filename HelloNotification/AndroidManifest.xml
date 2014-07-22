@@ -30,7 +30,7 @@
             </intent-filter>
         </service>
         <activity
-            android:name="com.zakoi.accessory.smartnotify.receiver.ToastOrNotificationTestActivity"
+            android:name="com.zakoi.accessory.smartnotify.receiver.NotificationReceiver"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

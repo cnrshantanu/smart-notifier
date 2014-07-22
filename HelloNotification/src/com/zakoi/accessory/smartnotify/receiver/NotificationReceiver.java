@@ -20,9 +20,9 @@ import com.sonyericsson.extras.liveware.extension.util.ExtensionUtils;
 import com.sonyericsson.extras.liveware.extension.util.notification.NotificationUtil;
 import com.zakoi.accessory.smartnotify.receiver.MyAccessibilityService.Constants;
  
-public class ToastOrNotificationTestActivity extends Activity {
+public class NotificationReceiver extends Activity {
  
-    private static final String TAG = "ToastOrNotificationTestActivity";
+    private static final String TAG = "Notification Receiver";
     private static PackageGrabber m_packageGrabber;
      
     @Override
