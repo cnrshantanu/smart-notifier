@@ -41,7 +41,11 @@ public class MyAccessibilityService extends AccessibilityService {
                
                 List<CharSequence> messages = event.getText();
                 if (messages.size() > 0) {
-                    final String notificationMsg = messages.get(0).toString();                       
+                	String temp_notificationMsg = "";
+                	for(int i = 0;i < messages.size(); i++){
+                		temp_notificationMsg += messages.get(i).toString();
+                	}
+                	final String notificationMsg = temp_notificationMsg;                       
                     Log.v(TAG, "Captured notification message [" + notificationMsg + "] for source [" + sourcePackageName + "]");                  
                     Log.v(TAG, "Broadcasting for " + Constants.ACTION_CATCH_NOTIFICATION);
                     try {

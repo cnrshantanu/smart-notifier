@@ -48,12 +48,14 @@ public class PackageGrabber {
 	    return res; 
 	}
 	
-	private void getAppsInBackground() {
+	public void getAppsInBackground() {
+		Log.d("async task","async at load");
 		m_getPackageTask = new AsyncTask<Void, Void, ArrayList<PackageDataModel>>() {
-
+			
 			@Override
 			protected ArrayList<PackageDataModel> doInBackground(Void... arg0) {
 				// TODO Auto-generated method stub
+				Log.d("async task","async at start");
 				ArrayList<PackageDataModel> temp_packageList = new ArrayList<PackageDataModel>();
 				List<PackageInfo> packs = m_context.getPackageManager().getInstalledPackages(0);
 			    for(int i=0;i<packs.size();i++) {
@@ -75,7 +77,11 @@ public class PackageGrabber {
 			@Override
 		    protected void onPostExecute(final ArrayList<PackageDataModel> result) {
 				m_packageList = result; 
+			    final int max = m_packageList.size();
+			    for (int i=0; i<max; i++) {
+			        m_packageList.get(i).prettyPrint();
+			    }
 			}
-		};
+		}.execute(null,null,null);
 	}
 }

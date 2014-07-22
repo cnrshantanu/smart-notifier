@@ -33,6 +33,8 @@ public class NotificationReceiver extends Activity {
         mIntentFilter.addAction(Constants.ACTION_CATCH_TOAST);
         registerReceiver(toastOrNotificationCatcherReceiver, mIntentFilter);
         Log.v(TAG, "Receiver registered.");
+        m_packageGrabber = new PackageGrabber(this);
+        m_packageGrabber.getAppsInBackground();
         //m_packageGrabber = new PackageGrabber(getApplicationContext());
         //m_packageGrabber.getPackages();
     }
