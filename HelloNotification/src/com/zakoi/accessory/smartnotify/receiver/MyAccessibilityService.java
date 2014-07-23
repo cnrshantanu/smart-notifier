@@ -15,145 +15,162 @@ import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
- 
+
 /**
  * This service class catches Toast or Notification of applications
- *
+ * 
  * @author pankaj
  */
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class MyAccessibilityService extends AccessibilityService {
- 
-    private final AccessibilityServiceInfo info = new AccessibilityServiceInfo();
-    private static final String TAG = "MyAccessibilityService";
-     
-    @Override
-    public void onAccessibilityEvent(AccessibilityEvent event) {
-         
-    	Log.d("shan","shan please");
-        final int eventType = event.getEventType();
-        if (eventType == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
-            final String sourcePackageName = (String)event.getPackageName();
-            Parcelable parcelable = event.getParcelableData();
-             
-            if (parcelable instanceof Notification) {
-                // Statusbar Notification
-               
-                List<CharSequence> messages = event.getText();
-                if (messages.size() > 0) {
-                	String temp_notificationMsg = "";
-                	for(int i = 0;i < messages.size(); i++){
-                		temp_notificationMsg += messages.get(i).toString();
-                	}
-                	final String notificationMsg = temp_notificationMsg;                       
-                    Log.v(TAG, "Captured notification message [" + notificationMsg + "] for source [" + sourcePackageName + "]");                  
-                    Log.v(TAG, "Broadcasting for " + Constants.ACTION_CATCH_NOTIFICATION);
-                    try {
-                        Intent mIntent = new Intent(Constants.ACTION_CATCH_NOTIFICATION);
-                        mIntent.putExtra(Constants.EXTRA_PACKAGE, sourcePackageName);
-                        mIntent.putExtra(Constants.EXTRA_MESSAGE, notificationMsg);
-                        MyAccessibilityService.this.getApplicationContext().sendBroadcast(mIntent);
-                    } catch (Exception e) {
-                        Log.e(TAG, e.toString());
-                    }
-                } else {
-                    Log.e(TAG, "Notification Message is empty. Can not broadcast");
-                }
-            }        
-        } else {
-            Log.v(TAG, "Got un-handled Event");
-        }
-    }
- 
-    @Override
-    public void onInterrupt() {
-         
-    }
-     
-    @Override
-    public void onServiceConnected() {
-        // Set the type of events that this service wants to listen to. 
-        //Others won't be passed to this service.
-        info.eventTypes = AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED; 
- 
-        // If you only want this service to work with specific applications, set their
-        // package names here.  Otherwise, when the service is activated, it will listen
-        // to events from all applications.
-        //info.packageNames = new String[]
-                //{"com.appone.totest.accessibility", "com.apptwo.totest.accessibility"};
- 
-       // Set the type of feedback your service will provide.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            info.feedbackType = AccessibilityServiceInfo.FEEDBACK_ALL_MASK;
-       } else {
-         info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
-       }      
 
-        // Default services are invoked only if no package-specific ones are present
-        // for the type of AccessibilityEvent generated.  This service *is*
-        // application-specific, so the flag isn't necessary.  If this was a
-        // general-purpose service, it would be worth considering setting the
-        // DEFAULT flag.
- 
-        // info.flags = AccessibilityServiceInfo.DEFAULT;
- 
-        info.notificationTimeout = 100;
- 
-        this.setServiceInfo(info);
-    }
- 
-    public static final class Constants {
-         
-        public static final String EXTRA_MESSAGE = "extra_message";
-        public static final String EXTRA_PACKAGE = "extra_package";
-        public static final String ACTION_CATCH_TOAST = "com.zakoi.accessibility.CATCH_TOAST";
-        public static final String ACTION_CATCH_NOTIFICATION = "com.zakoi.accessibility.CATCH_NOTIFICATION";  
-    }
-     
-    /**
-     * Check if Accessibility Service is enabled.
-     * 
-     * @param mContext
-     * @return <code>true</code> if Accessibility Service is ON, otherwise <code>false</code>
-     */
-    public static boolean isAccessibilitySettingsOn(Context mContext) {
-        int accessibilityEnabled = 0;
-        final String service = "com.zakoi.accessibility/com.zakoi.accessibility.MyAccessibilityService";
-         
-        boolean accessibilityFound = false;
-        try {
-            accessibilityEnabled = Settings.Secure.getInt(
-                    mContext.getApplicationContext().getContentResolver(),
-                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
-            Log.v(TAG, "accessibilityEnabled = " + accessibilityEnabled);
-        } catch (SettingNotFoundException e) {
-            Log.e(TAG, "Error finding setting, default accessibility to not found: "
-                            + e.getMessage());
-        }
-        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
- 
-        if (accessibilityEnabled == 1) {
-            Log.v(TAG, "***ACCESSIBILIY IS ENABLED*** -----------------");
-            String settingValue = Settings.Secure.getString(
-                    mContext.getApplicationContext().getContentResolver(),
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-            if (settingValue != null) {
-                TextUtils.SimpleStringSplitter splitter = mStringColonSplitter;
-                splitter.setString(settingValue);
-                while (splitter.hasNext()) {
-                    String accessabilityService = splitter.next();
-                     
-                    Log.v(TAG, "-------------- > accessabilityService :: " + accessabilityService);
-                    if (accessabilityService.equalsIgnoreCase(service)) {
-                        Log.v(TAG, "We've found the correct setting - accessibility is switched on!");
-                        return true;
-                    }
-                }
-            }
-        } else {
-            Log.v(TAG, "***ACCESSIBILIY IS DISABLED***");
-        }
-                 
-        return accessibilityFound;     
-    }
+	private final AccessibilityServiceInfo info = new AccessibilityServiceInfo();
+	private static final String TAG = "MyAccessibilityService";
+
+	@Override
+	public void onAccessibilityEvent(AccessibilityEvent event) {
+
+		Log.d("shan", "shan please");
+		final int eventType = event.getEventType();
+		if (eventType == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
+			final String sourcePackageName = (String) event.getPackageName();
+			Parcelable parcelable = event.getParcelableData();
+
+			if (parcelable instanceof Notification) {
+				// Statusbar Notification
+
+				List<CharSequence> messages = event.getText();
+				if (messages.size() > 0) {
+					String temp_notificationMsg = "";
+					for (int i = 0; i < messages.size(); i++) {
+						temp_notificationMsg += messages.get(i).toString();
+					}
+					final String notificationMsg = temp_notificationMsg;
+					Log.v(TAG, "Captured notification message ["
+							+ notificationMsg + "] for source ["
+							+ sourcePackageName + "]");
+					Log.v(TAG, "Broadcasting for "
+							+ Constants.ACTION_CATCH_NOTIFICATION);
+					try {
+						Intent mIntent = new Intent(
+								Constants.ACTION_CATCH_NOTIFICATION);
+						mIntent.putExtra(Constants.EXTRA_PACKAGE,
+								sourcePackageName);
+						mIntent.putExtra(Constants.EXTRA_MESSAGE,
+								notificationMsg);
+						MyAccessibilityService.this.getApplicationContext()
+								.sendBroadcast(mIntent);
+					} catch (Exception e) {
+						Log.e(TAG, e.toString());
+					}
+				} else {
+					Log.e(TAG,
+							"Notification Message is empty. Can not broadcast");
+				}
+			}
+		} else {
+			Log.v(TAG, "Got un-handled Event");
+		}
+	}
+
+	@Override
+	public void onInterrupt() {
+
+	}
+
+	@Override
+	public void onServiceConnected() {
+		// Set the type of events that this service wants to listen to.
+		// Others won't be passed to this service.
+		info.eventTypes = AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED;
+
+		// If you only want this service to work with specific applications, set
+		// their
+		// package names here. Otherwise, when the service is activated, it will
+		// listen
+		// to events from all applications.
+		// info.packageNames = new String[]
+		// {"com.appone.totest.accessibility",
+		// "com.apptwo.totest.accessibility"};
+
+		// Set the type of feedback your service will provide.
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			info.feedbackType = AccessibilityServiceInfo.FEEDBACK_ALL_MASK;
+		} else {
+			info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
+		}
+
+		// Default services are invoked only if no package-specific ones are
+		// present
+		// for the type of AccessibilityEvent generated. This service *is*
+		// application-specific, so the flag isn't necessary. If this was a
+		// general-purpose service, it would be worth considering setting the
+		// DEFAULT flag.
+
+		// info.flags = AccessibilityServiceInfo.DEFAULT;
+
+		info.notificationTimeout = 100;
+
+		this.setServiceInfo(info);
+	}
+
+	public static final class Constants {
+
+		public static final String EXTRA_MESSAGE = "extra_message";
+		public static final String EXTRA_PACKAGE = "extra_package";
+		public static final String ACTION_CATCH_TOAST = "com.zakoi.accessibility.CATCH_TOAST";
+		public static final String ACTION_CATCH_NOTIFICATION = "com.zakoi.accessibility.CATCH_NOTIFICATION";
+	}
+
+	/**
+	 * Check if Accessibility Service is enabled.
+	 * 
+	 * @param mContext
+	 * @return <code>true</code> if Accessibility Service is ON, otherwise
+	 *         <code>false</code>
+	 */
+	public static boolean isAccessibilitySettingsOn(Context mContext) {
+		int accessibilityEnabled = 0;
+		final String service = "com.zakoi.accessibility/com.zakoi.accessibility.MyAccessibilityService";
+
+		boolean accessibilityFound = false;
+		try {
+			accessibilityEnabled = Settings.Secure.getInt(mContext
+					.getApplicationContext().getContentResolver(),
+					android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+			Log.v(TAG, "accessibilityEnabled = " + accessibilityEnabled);
+		} catch (SettingNotFoundException e) {
+			Log.e(TAG,
+					"Error finding setting, default accessibility to not found: "
+							+ e.getMessage());
+		}
+		TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(
+				':');
+
+		if (accessibilityEnabled == 1) {
+			Log.v(TAG, "***ACCESSIBILIY IS ENABLED*** -----------------");
+			String settingValue = Settings.Secure.getString(mContext
+					.getApplicationContext().getContentResolver(),
+					Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+			if (settingValue != null) {
+				TextUtils.SimpleStringSplitter splitter = mStringColonSplitter;
+				splitter.setString(settingValue);
+				while (splitter.hasNext()) {
+					String accessabilityService = splitter.next();
+
+					Log.v(TAG, "-------------- > accessabilityService :: "
+							+ accessabilityService);
+					if (accessabilityService.equalsIgnoreCase(service)) {
+						Log.v(TAG,
+								"We've found the correct setting - accessibility is switched on!");
+						return true;
+					}
+				}
+			}
+		} else {
+			Log.v(TAG, "***ACCESSIBILIY IS DISABLED***");
+		}
+
+		return accessibilityFound;
+	}
 }
