@@ -48,8 +48,8 @@ public class PackageGrabber {
 			newInfo.pname = p.packageName;
 			newInfo.versionName = p.versionName;
 			newInfo.versionCode = p.versionCode;
-			newInfo.icon = p.applicationInfo.loadIcon(m_context
-					.getPackageManager());
+			//newInfo.icon = p.applicationInfo.loadIcon(m_context
+				//	.getPackageManager());
 			res.add(newInfo);
 		}
 		return res;
