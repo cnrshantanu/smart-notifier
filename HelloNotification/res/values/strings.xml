@@ -2,7 +2,7 @@
 <!-- No translation of sample extensions -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-    <string name="app_name">Hello Notification</string>
+    <string name="app_name">Smart Notify</string>
     <!-- Title of preference activity -->
     <string name="preference_activity_title">Hello Notification settings</string>
     <!-- Configuration text shown in preferences -->
