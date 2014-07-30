@@ -15,8 +15,10 @@ import com.zakoi.accessory.smartnotify.receiver.PackageDataModel;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
+	private final String TAG = "DataBaseHelper";
+	
 	public static final int DATABASE_VERSION = 1;
-	public static final String DATABASE_NAME = "test1.db";
+	public static final String DATABASE_NAME = "test.db";
 
 	public static abstract class PackageEntry {
 		private static final String KEY_ID = "id";
@@ -28,7 +30,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 	private static final String TEXT_TYPE = " TEXT";
 	private static final String COMMA_SEP = ",";
-	private String[] allColumns = { PackageEntry.COLUMN_NAME_PACKAGE_NAME,
+	private String[] allColumns = { PackageEntry.KEY_ID,
+			PackageEntry.COLUMN_NAME_PACKAGE_NAME,
 			PackageEntry.COLUMN_NAME_APP, PackageEntry.COLUMN_NAME_ICON };
 	private static final String SQL_CREATE_ENTRIES = "CREATE TABLE "
 			+ PackageEntry.TABLE_NAME + " (" + PackageEntry.KEY_ID
@@ -63,19 +66,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	public void addPackage(PackageDataModel p) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
-		int temp_id = getPackageId(p.getPackage());
-		
-		Log.d("db"," the id of package name "+temp_id);
-		if(temp_id == -1) {
+		long temp_id = getPackageId(p.getPackage());
+		if (temp_id == -1) {
 			ContentValues values = new ContentValues();
 			values.put(PackageEntry.COLUMN_NAME_PACKAGE_NAME, p.getPackage());
 			values.put(PackageEntry.COLUMN_NAME_APP, p.getAppName());
 			values.put(PackageEntry.COLUMN_NAME_ICON, p.getIcon());
-
-			long insert_id = db.insert(PackageEntry.TABLE_NAME, null, values);
-			Log.d("db", "insert id is " + insert_id);
+			db.insert(PackageEntry.TABLE_NAME, null, values);
 			db.close();
-		} 
+		} else {
+			p.setId(temp_id);
+			updatePackage(p);
+		}
 
 	}
 
@@ -83,7 +85,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 	}
 
-	private int getPackageId(String package_name) {
+	private long getPackageId(String package_name) {
 		String query = "Select * FROM " + PackageEntry.TABLE_NAME + " WHERE "
 				+ PackageEntry.COLUMN_NAME_PACKAGE_NAME + " =  \""
 				+ package_name + "\"";
@@ -91,7 +93,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		Cursor cursor = db.rawQuery(query, null);
 
 		if (cursor.moveToFirst()) {
-			return Integer.parseInt(cursor.getString(0));
+			return Long.parseLong(cursor.getString(0));
 		} else
 			return -1;
 	}
@@ -103,29 +105,34 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 				null, null, null, null);
 		if (cursor.moveToFirst()) {
 			do {
-				PackageDataModel pck = new PackageDataModel();
-				pck.setPackage(cursor.getString(0));
-				pck.setSetAppName(cursor.getString(1));
-				pck.setIcon(cursor.getString(2));
-				temp.add(pck);
+				temp.add(cursortoPackageData(cursor));
 			} while (cursor.moveToNext());
 		}
 
 		return temp;
 	}
 
-	public void updatePackage(PackageDataModel p) {
+	public int updatePackage(PackageDataModel p) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(PackageEntry.COLUMN_NAME_PACKAGE_NAME, p.getPackage());
+		values.put(PackageEntry.COLUMN_NAME_APP, p.getAppName());
+		values.put(PackageEntry.COLUMN_NAME_ICON, p.getIcon());
 
+		return db.update(PackageEntry.TABLE_NAME, values, PackageEntry.KEY_ID
+				+ " = ?", new String[] { String.valueOf(p.getId()) });
 	}
 
 	public void deletePackage(PackageDataModel p) {
 
 	}
 
-	private PackageDataModel cursortoPackageData(Cursor c) {
-		PackageDataModel temp = new PackageDataModel();
-		// temp.setPackage(c.))
-		return temp;
-
+	private PackageDataModel cursortoPackageData(Cursor cursor) {
+		PackageDataModel pck = new PackageDataModel();
+		pck.setId(Long.parseLong(cursor.getString(0)));
+		pck.setPackage(cursor.getString(1));
+		pck.setSetAppName(cursor.getString(2));
+		pck.setIcon(cursor.getString(3));
+		return pck;
 	}
 }

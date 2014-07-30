@@ -19,7 +19,6 @@ import com.example.sonymobile.smartextension.hellonotification.R;
 import com.sonyericsson.extras.liveware.aef.notification.Notification;
 import com.sonyericsson.extras.liveware.extension.util.ExtensionUtils;
 import com.sonyericsson.extras.liveware.extension.util.notification.NotificationUtil;
-import com.zakoi.accessory.smartnotify.database.DataBaseHelper;
 import com.zakoi.accessory.smartnotify.receiver.MyAccessibilityService.Constants;
 
 public class NotificationReceiver extends Activity {
@@ -36,32 +35,8 @@ public class NotificationReceiver extends Activity {
 		mIntentFilter.addAction(Constants.ACTION_CATCH_TOAST);
 		registerReceiver(toastOrNotificationCatcherReceiver, mIntentFilter);
 		Log.v(TAG, "Receiver registered.");
-		//m_packageGrabber = new PackageGrabber(this);
-		//m_packageGrabber.getAppsInBackground();
-		DataBaseHelper db = new DataBaseHelper(this);
-		
-		Log.d("Insert: ", "Inserting ..");
-		PackageDataModel p = new PackageDataModel();
-		p.setIcon("cow_icon");
-		p.setPackage("com.shan.ram");
-		p.setSetAppName("come_on");
-		db.addPackage(p);
-		db.addPackage(p);
-		db.addPackage(p);
-		p.setPackage("com.shan.ram.allah");
-		db.addPackage(p);
-		db.addPackage(p);
-		db.addPackage(p);
-		db.addPackage(p);
-		
-		Log.d("Reading: ", "Reading all contacts.."); 
-		List<PackageDataModel> package_list = db.getAllPackages();
-		
-		for(PackageDataModel pck : package_list){
-			Log.d("database","package extracted :" + pck.getAppName() + "   " + pck.getPackage() + "  " + pck.getIcon());
-		}
-		// m_packageGrabber = new PackageGrabber(getApplicationContext());
-		// m_packageGrabber.getPackages();
+		m_packageGrabber = new PackageGrabber(this);
+		m_packageGrabber.getAppsInBackground();
 	}
 
 	@Override

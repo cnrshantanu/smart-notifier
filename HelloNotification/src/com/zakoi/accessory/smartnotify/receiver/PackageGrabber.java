@@ -3,6 +3,9 @@ package com.zakoi.accessory.smartnotify.receiver;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zakoi.accessory.smartnotify.database.DataBaseHelper;
+
+import android.R.string;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.graphics.drawable.Drawable;
@@ -11,13 +14,17 @@ import android.util.Log;
 
 public class PackageGrabber {
 
+	private final String TAG = "PackageGrabber";
 	private Context m_context;
 	private AsyncTask m_getPackageTask;
+	private DataBaseHelper m_packageDB;
+	
 	ArrayList<PackageDataModel> m_packageList;
 
 	public PackageGrabber(Context context) {
 		m_context = context;
 		m_packageList = new ArrayList<PackageDataModel>();
+		m_packageDB = new DataBaseHelper(context);
 	}
 
 	public ArrayList<PackageDataModel> getPackages() {
@@ -51,12 +58,13 @@ public class PackageGrabber {
 			//newInfo.icon = p.applicationInfo.loadIcon(m_context
 				//	.getPackageManager());
 			res.add(newInfo);
+			m_packageDB.addPackage(newInfo);
 		}
 		return res;
 	}
 
 	public void getAppsInBackground() {
-		Log.d("async task", "async at load");
+		Log.d(TAG, "async at load");
 		m_getPackageTask = new AsyncTask<Void, Void, ArrayList<PackageDataModel>>() {
 
 			@Override
@@ -89,9 +97,20 @@ public class PackageGrabber {
 				m_packageList = result;
 				final int max = m_packageList.size();
 				for (int i = 0; i < max; i++) {
-					m_packageList.get(i).prettyPrint();
+					m_packageDB.addPackage(m_packageList.get(i));
+					//m_packageList.get(i).prettyPrint();
 				}
+				printPackagesFromDB();
 			}
 		}.execute(null, null, null);
+	}
+	
+	void printPackagesFromDB() {
+		Log.i(TAG, "Reading all contacts.."); 
+		List<PackageDataModel> package_list = m_packageDB.getAllPackages();
+		
+		for(PackageDataModel pck : package_list){
+			Log.i(TAG," id : "+ pck.getId() + " package extracted :" + pck.getPackage() + " application name :  " + pck.getAppName() + " get icon : " + pck.getIcon());
+		}
 	}
 }

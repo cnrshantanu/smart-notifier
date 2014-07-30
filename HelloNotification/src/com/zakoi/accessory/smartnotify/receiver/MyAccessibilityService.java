@@ -5,9 +5,13 @@ import java.util.List;
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.TargetApi;
-import android.app.Notification;
+//import android.app.Notification;
+import com.sonyericsson.extras.liveware.aef.notification.Notification;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Parcelable;
 import android.provider.Settings;
@@ -15,6 +19,11 @@ import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
+
+import com.example.sonymobile.smartextension.hellonotification.HelloNotificationExtensionService;
+import com.example.sonymobile.smartextension.hellonotification.R;
+import com.sonyericsson.extras.liveware.extension.util.ExtensionUtils;
+import com.sonyericsson.extras.liveware.extension.util.notification.NotificationUtil;
 
 /**
  * This service class catches Toast or Notification of applications
@@ -36,7 +45,7 @@ public class MyAccessibilityService extends AccessibilityService {
 			final String sourcePackageName = (String) event.getPackageName();
 			Parcelable parcelable = event.getParcelableData();
 
-			if (parcelable instanceof Notification) {
+			if (parcelable instanceof android.app.Notification) {
 				// Statusbar Notification
 
 				List<CharSequence> messages = event.getText();
@@ -112,6 +121,47 @@ public class MyAccessibilityService extends AccessibilityService {
 		info.notificationTimeout = 100;
 
 		this.setServiceInfo(info);
+	}
+
+	public void addData(String package_name, String message) {
+		long time = System.currentTimeMillis();
+		long sourceId = NotificationUtil.getSourceId(this,
+				HelloNotificationExtensionService.EXTENSION_SPECIFIC_ID);
+		if (sourceId == NotificationUtil.INVALID_ID) {
+			Log.e(HelloNotificationExtensionService.LOG_TAG,
+					"Failed to insert data");
+			return;
+		}
+
+		try {
+
+			String profileImage;
+			ApplicationInfo appInfo;
+			String app_name;
+			appInfo = this.getPackageManager().getApplicationInfo(package_name,
+					0);
+			if (appInfo.icon != 0) {
+				Uri icon_uri = Uri.parse("android.resource://" + package_name
+						+ "/" + appInfo.icon);
+				profileImage = icon_uri.toString();
+			} else
+				profileImage = ExtensionUtils.getUriString(this,
+						R.drawable.widget_default_userpic_bg);
+			app_name = appInfo.loadLabel(getPackageManager()).toString();
+			// Build the notification.
+			ContentValues eventValues = new ContentValues();
+			eventValues.put(Notification.EventColumns.EVENT_READ_STATUS, false);
+			eventValues.put(Notification.EventColumns.DISPLAY_NAME, app_name);
+			eventValues.put(Notification.EventColumns.MESSAGE, message);
+			eventValues.put(Notification.EventColumns.PERSONAL, 1);
+			eventValues.put(Notification.EventColumns.PROFILE_IMAGE_URI,
+					profileImage);
+			eventValues.put(Notification.EventColumns.PUBLISHED_TIME, time);
+			eventValues.put(Notification.EventColumns.SOURCE_ID, sourceId);
+			NotificationUtil.addEvent(this, eventValues);
+		} catch (Exception e) {
+			Log.d(TAG, "could not load details");
+		}
 	}
 
 	public static final class Constants {
