@@ -43,10 +43,16 @@ public class NotificationReceiver extends Activity {
 		Log.d("Insert: ", "Inserting ..");
 		PackageDataModel p = new PackageDataModel();
 		p.setIcon("cow_icon");
-		p.setPackage("com.shan");
+		p.setPackage("com.shan.ram");
 		p.setSetAppName("come_on");
 		db.addPackage(p);
-		
+		db.addPackage(p);
+		db.addPackage(p);
+		p.setPackage("com.shan.ram.allah");
+		db.addPackage(p);
+		db.addPackage(p);
+		db.addPackage(p);
+		db.addPackage(p);
 		
 		Log.d("Reading: ", "Reading all contacts.."); 
 		List<PackageDataModel> package_list = db.getAllPackages();

@@ -28,13 +28,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 	private static final String TEXT_TYPE = " TEXT";
 	private static final String COMMA_SEP = ",";
-	private String[] allColumns = { PackageEntry.COLUMN_NAME_PACKAGE_NAME,PackageEntry.COLUMN_NAME_APP,PackageEntry.COLUMN_NAME_ICON };
+	private String[] allColumns = { PackageEntry.COLUMN_NAME_PACKAGE_NAME,
+			PackageEntry.COLUMN_NAME_APP, PackageEntry.COLUMN_NAME_ICON };
 	private static final String SQL_CREATE_ENTRIES = "CREATE TABLE "
 			+ PackageEntry.TABLE_NAME + " (" + PackageEntry.KEY_ID
-			+ " INTEGER PRIMARY KEY AUTOINCREMENT," + PackageEntry.COLUMN_NAME_PACKAGE_NAME
-			+ TEXT_TYPE + COMMA_SEP + PackageEntry.COLUMN_NAME_APP + TEXT_TYPE
-			+ COMMA_SEP + PackageEntry.COLUMN_NAME_ICON + TEXT_TYPE
-			+ " )";
+			+ " INTEGER PRIMARY KEY AUTOINCREMENT,"
+			+ PackageEntry.COLUMN_NAME_PACKAGE_NAME + TEXT_TYPE + COMMA_SEP
+			+ PackageEntry.COLUMN_NAME_APP + TEXT_TYPE + COMMA_SEP
+			+ PackageEntry.COLUMN_NAME_ICON + TEXT_TYPE + " )";
 
 	private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
 			+ PackageEntry.TABLE_NAME;
@@ -61,21 +62,20 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 	public void addPackage(PackageDataModel p) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		
-		Cursor cursor = db.query(PackageEntry.TABLE_NAME,
-		        allColumns, PackageEntry.COLUMN_NAME_PACKAGE_NAME + " =? " + new String[] {String.valueOf(1)}, null,
-		        null, null, null);
-		if (cursor.moveToFirst()) {
-			return;
-		}
-		ContentValues values = new ContentValues();
-		values.put(PackageEntry.COLUMN_NAME_PACKAGE_NAME, p.getPackage());
-		values.put(PackageEntry.COLUMN_NAME_APP, p.getAppName());
-		values.put(PackageEntry.COLUMN_NAME_ICON, p.getIcon());
 
-		long insert_id = db.insert(PackageEntry.TABLE_NAME, null, values);
-		Log.d("db","insert id is "+ insert_id);
-		db.close();
+		int temp_id = getPackageId(p.getPackage());
+		
+		Log.d("db"," the id of package name "+temp_id);
+		if(temp_id == -1) {
+			ContentValues values = new ContentValues();
+			values.put(PackageEntry.COLUMN_NAME_PACKAGE_NAME, p.getPackage());
+			values.put(PackageEntry.COLUMN_NAME_APP, p.getAppName());
+			values.put(PackageEntry.COLUMN_NAME_ICON, p.getIcon());
+
+			long insert_id = db.insert(PackageEntry.TABLE_NAME, null, values);
+			Log.d("db", "insert id is " + insert_id);
+			db.close();
+		} 
 
 	}
 
@@ -83,21 +83,34 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 	}
 
+	private int getPackageId(String package_name) {
+		String query = "Select * FROM " + PackageEntry.TABLE_NAME + " WHERE "
+				+ PackageEntry.COLUMN_NAME_PACKAGE_NAME + " =  \""
+				+ package_name + "\"";
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(query, null);
+
+		if (cursor.moveToFirst()) {
+			return Integer.parseInt(cursor.getString(0));
+		} else
+			return -1;
+	}
+
 	public List<PackageDataModel> getAllPackages() {
 		SQLiteDatabase db = this.getReadableDatabase();
 		List<PackageDataModel> temp = new ArrayList<PackageDataModel>();
-		Cursor cursor = db.query(PackageEntry.TABLE_NAME, allColumns,
-				null, null, null, null, null);
-		if(cursor.moveToFirst()){
+		Cursor cursor = db.query(PackageEntry.TABLE_NAME, allColumns, null,
+				null, null, null, null);
+		if (cursor.moveToFirst()) {
 			do {
-				PackageDataModel pck =  new PackageDataModel();
+				PackageDataModel pck = new PackageDataModel();
 				pck.setPackage(cursor.getString(0));
 				pck.setSetAppName(cursor.getString(1));
 				pck.setIcon(cursor.getString(2));
 				temp.add(pck);
 			} while (cursor.moveToNext());
 		}
-		
+
 		return temp;
 	}
 
@@ -108,11 +121,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	public void deletePackage(PackageDataModel p) {
 
 	}
-	
+
 	private PackageDataModel cursortoPackageData(Cursor c) {
 		PackageDataModel temp = new PackageDataModel();
-		//temp.setPackage(c.))
+		// temp.setPackage(c.))
 		return temp;
-		
+
 	}
 }
