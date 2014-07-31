@@ -18,7 +18,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	private final String TAG = "DataBaseHelper";
 	
 	public static final int DATABASE_VERSION = 1;
-	public static final String DATABASE_NAME = "test.db";
+	public static final String DATABASE_NAME = "test2.db";
 
 	public static abstract class PackageEntry {
 		private static final String KEY_ID = "id";
