@@ -52,181 +52,212 @@ import com.sonyericsson.extras.liveware.extension.util.notification.Notification
 import java.util.Random;
 
 /**
- * This preference activity lets the user send notifications. It also allows
- * the user to clear all notifications associated with this extension.
+ * This preference activity lets the user send notifications. It also allows the
+ * user to clear all notifications associated with this extension.
  */
 public class HelloNotificationPreferenceActivity extends PreferenceActivity {
 
-    private static final int DIALOG_READ_ME = 1;
+	private static final int DIALOG_READ_ME = 1;
+	private static final int DIALOG_CLEAR = 2;
+	private static final int DIALOG_APP_LIST = 3;
 
-    private static final int DIALOG_CLEAR = 2;
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+		// Load the preferences from an XML resource.
+		addPreferencesFromResource(R.xml.preferences);
 
-        // Load the preferences from an XML resource.
-        addPreferencesFromResource(R.xml.preferences);
+		// Show Readme dialogue.
+		Preference preference = findPreference(getText(R.string.preference_key_read_me));
+		preference
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
+						showDialog(DIALOG_READ_ME);
+						return true;
+					}
+				});
 
-        // Show Readme dialogue.
-        Preference preference = findPreference(getText(R.string.preference_key_read_me));
-        preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                showDialog(DIALOG_READ_ME);
-                return true;
-            }
-        });
+		// Send a notification.
+		preference = findPreference(getString(R.string.preference_key_send));
+		preference
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
+						addData();
+						return true;
+					}
+				});
 
-        // Send a notification.
-        preference = findPreference(getString(R.string.preference_key_send));
-        preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                addData();
-                return true;
-            }
-        });
+		// Show the Clear notifications dialogue.
+		preference = findPreference(getString(R.string.preference_key_clear));
+		preference
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
+						showDialog(DIALOG_CLEAR);
+						return true;
+					}
+				});
 
-        // Show the Clear notifications dialogue.
-        preference = findPreference(getString(R.string.preference_key_clear));
-        preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                showDialog(DIALOG_CLEAR);
-                return true;
-            }
-        });
+		preference = findPreference(getString(R.string.preference_key_app_list));
+		preference
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
+						showDialog(DIALOG_APP_LIST);
+						return true;
+					}
+				});
 
-        // Remove preferences that are not supported by the accessory.
-        if (!ExtensionUtils.supportsHistory(getIntent())) {
-            preference = findPreference(getString(R.string.preference_key_clear));
-            getPreferenceScreen().removePreference(preference);
-        }
-    }
+		// Remove preferences that are not supported by the accessory.
+		if (!ExtensionUtils.supportsHistory(getIntent())) {
+			preference = findPreference(getString(R.string.preference_key_clear));
+			getPreferenceScreen().removePreference(preference);
+		}
+	}
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        Dialog dialog = null;
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		Dialog dialog = null;
 
-        // Identify and show the appropriate dialogue on the phone.
-        switch (id) {
-            case DIALOG_READ_ME:
-                dialog = createReadMeDialog();
-                break;
-            case DIALOG_CLEAR:
-                dialog = createClearDialog();
-                break;
-            default:
-                Log.w(HelloNotificationExtensionService.LOG_TAG, "Not a valid dialogue id: " + id);
-                break;
-        }
+		// Identify and show the appropriate dialogue on the phone.
+		switch (id) {
+		case DIALOG_READ_ME:
+			dialog = createReadMeDialog();
+			break;
+		case DIALOG_CLEAR:
+			dialog = createClearDialog();
+			break;
 
-        return dialog;
-    }
+		case DIALOG_APP_LIST:
+			dialog = createAppListDialog();
+			break;
+		default:
+			Log.w(HelloNotificationExtensionService.LOG_TAG,
+					"Not a valid dialogue id: " + id);
+			break;
+		}
 
-    /**
-     * Creates the Readme dialog.
-     *
-     * @return The dialog.
-     */
-    private Dialog createReadMeDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.preference_option_read_me_txt)
-                .setTitle(R.string.preference_option_read_me)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setPositiveButton(android.R.string.ok, new OnClickListener() {
+		return dialog;
+	}
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        return builder.create();
-    }
+	private Dialog createAppListDialog() {
+		final Dialog app_dialog = new Dialog(this);
+		app_dialog.setContentView(R.layout.app_list_item);
+		app_dialog.setTitle(R.string.app_list_title);
+		return app_dialog;
+	}
 
-    /**
-     * Creates the Clear all notifications dialog.
-     *
-     * @return The dialog.
-     */
-    private Dialog createClearDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.preference_option_clear_txt)
-                .setTitle(R.string.preference_option_clear)
-                .setIcon(android.R.drawable.ic_input_delete)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        new ClearEventsTask().execute();
-                    }
-                }).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-        return builder.create();
-    }
+	/**
+	 * Creates the Readme dialog.
+	 * 
+	 * @return The dialog.
+	 */
+	private Dialog createReadMeDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(R.string.preference_option_read_me_txt)
+				.setTitle(R.string.preference_option_read_me)
+				.setIcon(android.R.drawable.ic_dialog_info)
+				.setPositiveButton(android.R.string.ok, new OnClickListener() {
 
-    /**
-     * Clears all notifications.
-     */
-    private class ClearEventsTask extends AsyncTask<Void, Void, Integer> {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+					}
+				});
+		return builder.create();
+	}
 
-        @Override
-        protected void onPreExecute() {
-        }
+	/**
+	 * Creates the Clear all notifications dialog.
+	 * 
+	 * @return The dialog.
+	 */
+	private Dialog createClearDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(R.string.preference_option_clear_txt)
+				.setTitle(R.string.preference_option_clear)
+				.setIcon(android.R.drawable.ic_input_delete)
+				.setPositiveButton(android.R.string.yes,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								new ClearEventsTask().execute();
+							}
+						})
+				.setNegativeButton(android.R.string.no,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
+		return builder.create();
+	}
 
-        @Override
-        protected Integer doInBackground(Void... params) {
-            int nbrDeleted = 0;
-            nbrDeleted = NotificationUtil.deleteAllEvents(HelloNotificationPreferenceActivity.this);
-            return nbrDeleted;
-        }
+	/**
+	 * Clears all notifications.
+	 */
+	private class ClearEventsTask extends AsyncTask<Void, Void, Integer> {
 
-        @Override
-        protected void onPostExecute(Integer id) {
-            if (id != NotificationUtil.INVALID_ID) {
-                Toast.makeText(HelloNotificationPreferenceActivity.this, R.string.clear_success,
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(HelloNotificationPreferenceActivity.this, R.string.clear_failure,
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+		@Override
+		protected void onPreExecute() {
+		}
 
-    /**
-     * This method sets randomly generated data that will be connected to a
-     * notification.
-     */
-    private void addData() {
-        
-        String name = "Shantanu Das";
-        String message = "testing connection";
-        long time = System.currentTimeMillis();
-        long sourceId = NotificationUtil.getSourceId(this,
-                HelloNotificationExtensionService.EXTENSION_SPECIFIC_ID);
-        if (sourceId == NotificationUtil.INVALID_ID) {
-            Log.e(HelloNotificationExtensionService.LOG_TAG, "Failed to insert data");
-            return;
-        }
-        String profileImage = ExtensionUtils.getUriString(this,
-                R.drawable.headset_pro_ok_icn);
+		@Override
+		protected Integer doInBackground(Void... params) {
+			int nbrDeleted = 0;
+			nbrDeleted = NotificationUtil
+					.deleteAllEvents(HelloNotificationPreferenceActivity.this);
+			return nbrDeleted;
+		}
 
-        // Build the notification.
-        ContentValues eventValues = new ContentValues();
-        eventValues.put(Notification.EventColumns.EVENT_READ_STATUS, false);
-        eventValues.put(Notification.EventColumns.DISPLAY_NAME, name);
-        eventValues.put(Notification.EventColumns.MESSAGE, message);
-        eventValues.put(Notification.EventColumns.PERSONAL, 1);
-        eventValues.put(Notification.EventColumns.PROFILE_IMAGE_URI, profileImage);
-        eventValues.put(Notification.EventColumns.PUBLISHED_TIME, time);
-        eventValues.put(Notification.EventColumns.SOURCE_ID, sourceId);
+		@Override
+		protected void onPostExecute(Integer id) {
+			if (id != NotificationUtil.INVALID_ID) {
+				Toast.makeText(HelloNotificationPreferenceActivity.this,
+						R.string.clear_success, Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(HelloNotificationPreferenceActivity.this,
+						R.string.clear_failure, Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
 
-        NotificationUtil.addEvent(this, eventValues);
-    }
+	/**
+	 * This method sets randomly generated data that will be connected to a
+	 * notification.
+	 */
+	private void addData() {
+
+		String name = "Shantanu Das";
+		String message = "testing connection";
+		long time = System.currentTimeMillis();
+		long sourceId = NotificationUtil.getSourceId(this,
+				HelloNotificationExtensionService.EXTENSION_SPECIFIC_ID);
+		if (sourceId == NotificationUtil.INVALID_ID) {
+			Log.e(HelloNotificationExtensionService.LOG_TAG,
+					"Failed to insert data");
+			return;
+		}
+		String profileImage = ExtensionUtils.getUriString(this,
+				R.drawable.headset_pro_ok_icn);
+
+		// Build the notification.
+		ContentValues eventValues = new ContentValues();
+		eventValues.put(Notification.EventColumns.EVENT_READ_STATUS, false);
+		eventValues.put(Notification.EventColumns.DISPLAY_NAME, name);
+		eventValues.put(Notification.EventColumns.MESSAGE, message);
+		eventValues.put(Notification.EventColumns.PERSONAL, 1);
+		eventValues.put(Notification.EventColumns.PROFILE_IMAGE_URI,
+				profileImage);
+		eventValues.put(Notification.EventColumns.PUBLISHED_TIME, time);
+		eventValues.put(Notification.EventColumns.SOURCE_ID, sourceId);
+
+		NotificationUtil.addEvent(this, eventValues);
+	}
 
 }
