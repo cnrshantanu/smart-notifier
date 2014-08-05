@@ -43,13 +43,13 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.sonyericsson.extras.liveware.aef.notification.Notification;
 import com.sonyericsson.extras.liveware.extension.util.ExtensionUtils;
 import com.sonyericsson.extras.liveware.extension.util.notification.NotificationUtil;
-
-import java.util.Random;
 
 /**
  * This preference activity lets the user send notifications. It also allows the
@@ -146,8 +146,13 @@ public class HelloNotificationPreferenceActivity extends PreferenceActivity {
 
 	private Dialog createAppListDialog() {
 		final Dialog app_dialog = new Dialog(this);
-		app_dialog.setContentView(R.layout.app_list_item);
+		app_dialog.setContentView(R.layout.app_list);
 		app_dialog.setTitle(R.string.app_list_title);
+		
+		String names[] ={"A","B","C","D"};
+		ListView lv = (ListView ) app_dialog.findViewById(R.id.lv);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,names);
+		lv.setAdapter(adapter);
 		return app_dialog;
 	}
 
