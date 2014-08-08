@@ -3,14 +3,13 @@ package com.zakoi.accessory.smartnotify.receiver;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zakoi.accessory.smartnotify.database.DataBaseHelper;
-
-import android.R.string;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.zakoi.accessory.smartnotify.database.DataBaseHelper;
 
 public class PackageGrabber {
 
@@ -68,8 +67,12 @@ public class PackageGrabber {
 						.getInstalledPackages(0);
 				for (int i = 0; i < packs.size(); i++) {
 					PackageInfo p = packs.get(i);
+					
 					if ((p.versionName == null)) {
 						continue;
+					} 
+					if(!(m_context.getPackageManager().getLaunchIntentForPackage(p.applicationInfo.packageName) != null) ){
+		                continue;
 					}
 					PackageDataModel newInfo = new PackageDataModel();
 					newInfo.appname = p.applicationInfo.loadLabel(
@@ -77,7 +80,6 @@ public class PackageGrabber {
 					newInfo.pname = p.packageName;
 					newInfo.versionName = p.versionName;
 					newInfo.versionCode = p.versionCode;
-					//newInfo.icon_uri = p.applicationInfo.loadIcon(m_context.getPackageManager());
 					temp_packageList.add(newInfo);
 				}
 				return temp_packageList;
