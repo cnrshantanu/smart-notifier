@@ -11,8 +11,17 @@ public class PackageDataModel {
 	String versionName = "";
 	String icon_uri = "";
 	int versionCode = 0;
+	Boolean canNotify = false;
 	String TAG = "Package Model";
 
+	public Boolean getCanNotify() {
+		return canNotify;
+	}
+	
+	public void setCanNotify(Boolean value) {
+		canNotify = value;
+	}
+	
 	public long getId() {
 		return id;
 	}
