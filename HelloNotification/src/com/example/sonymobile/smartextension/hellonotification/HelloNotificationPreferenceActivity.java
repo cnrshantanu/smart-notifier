@@ -32,6 +32,9 @@ Copyright (c) 2011-2013, Sony Mobile Communications AB
 
 package com.example.sonymobile.smartextension.hellonotification;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
@@ -50,6 +53,8 @@ import android.widget.Toast;
 import com.sonyericsson.extras.liveware.aef.notification.Notification;
 import com.sonyericsson.extras.liveware.extension.util.ExtensionUtils;
 import com.sonyericsson.extras.liveware.extension.util.notification.NotificationUtil;
+import com.zakoi.accessory.smartnotify.receiver.PackageDataModel;
+import com.zakoi.accessory.smartnotify.receiver.PackageGrabber;
 
 /**
  * This preference activity lets the user send notifications. It also allows the
@@ -60,11 +65,14 @@ public class HelloNotificationPreferenceActivity extends PreferenceActivity {
 	private static final int DIALOG_READ_ME = 1;
 	private static final int DIALOG_CLEAR = 2;
 	private static final int DIALOG_APP_LIST = 3;
+	private PackageGrabber m_packageGrabber;
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		m_packageGrabber = new PackageGrabber(this);
+		m_packageGrabber.getAppsInBackground();
 
 		// Load the preferences from an XML resource.
 		addPreferencesFromResource(R.xml.preferences);
@@ -148,10 +156,12 @@ public class HelloNotificationPreferenceActivity extends PreferenceActivity {
 		final Dialog app_dialog = new Dialog(this);
 		app_dialog.setContentView(R.layout.app_list);
 		app_dialog.setTitle(R.string.app_list_title);
-		
-		String names[] ={"A","B","C","D"};
-		ListView lv = (ListView ) app_dialog.findViewById(R.id.lv);
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,names);
+
+		ListView lv = (ListView) app_dialog.findViewById(R.id.lv);
+		List<PackageDataModel> packList = new ArrayList<PackageDataModel>();
+		packList = m_packageGrabber.getPackages();
+		ArrayAdapter<PackageDataModel> adapter = new PackageAdapter(this,
+				R.layout.app_list_item, packList);
 		lv.setAdapter(adapter);
 		return app_dialog;
 	}

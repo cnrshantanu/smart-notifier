@@ -28,16 +28,8 @@ public class PackageGrabber {
 	}
 
 	public ArrayList<PackageDataModel> getPackages() {
-		ArrayList<PackageDataModel> apps = getInstalledApps(false); /*
-																	 * false =
-																	 * no system
-																	 * packages
-																	 */
-		final int max = apps.size();
-		for (int i = 0; i < max; i++) {
-			apps.get(i).prettyPrint();
-		}
-		return apps;
+		
+		return m_packageList;
 	}
 
 	private ArrayList<PackageDataModel> getInstalledApps(boolean getSysPackages) {
