@@ -1,10 +1,11 @@
 package com.zakoi.accessory.smartnotify.receiver;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -82,6 +83,7 @@ public class PackageGrabber {
 					newInfo.versionCode = p.versionCode;
 					temp_packageList.add(newInfo);
 				}
+				Collections.sort(temp_packageList, new PackageComparator());
 				return temp_packageList;
 			}
 
@@ -107,4 +109,14 @@ public class PackageGrabber {
 			Log.i(TAG," id : "+ pck.getId() + " package extracted :" + pck.getPackage() + " application name :  " + pck.getAppName() + " get icon : " + pck.getIcon());
 		}
 	}
+	
+	public class PackageComparator implements Comparator<PackageDataModel> {
+
+		@Override
+		public int compare(PackageDataModel p1, PackageDataModel p2) {
+			return p1.getAppName().compareToIgnoreCase(p2.getAppName());
+			
+		}
+		
+	};
 }
