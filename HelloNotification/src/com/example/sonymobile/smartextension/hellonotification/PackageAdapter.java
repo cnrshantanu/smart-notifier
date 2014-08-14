@@ -53,6 +53,8 @@ public class PackageAdapter extends ArrayAdapter<PackageDataModel> {
 		     public void onClick(View v) { 
 		      CheckBox cb = (CheckBox) v ;
 		      currentPackage.setCanNotify(cb.isChecked());
+		      Log.d(TAG,currentPackage.getAppName());
+		      
 		     }
 		 });
 		

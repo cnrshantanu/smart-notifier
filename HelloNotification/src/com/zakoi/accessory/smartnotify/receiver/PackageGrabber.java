@@ -94,6 +94,7 @@ public class PackageGrabber {
 				final int max = m_packageList.size();
 				for (int i = 0; i < max; i++) {
 					m_packageDB.addPackage(m_packageList.get(i));
+					
 					//m_packageList.get(i).prettyPrint();
 				}
 				printPackagesFromDB();
@@ -101,12 +102,15 @@ public class PackageGrabber {
 		}.execute(null, null, null);
 	}
 	
+	void addPackage() {
+		
+	}
 	void printPackagesFromDB() {
-		Log.i(TAG, "Reading all contacts.."); 
+		Log.i(TAG, "Reading all applications."); 
 		List<PackageDataModel> package_list = m_packageDB.getAllPackages();
 		
 		for(PackageDataModel pck : package_list){
-			Log.i(TAG," id : "+ pck.getId() + " package extracted :" + pck.getPackage() + " application name :  " + pck.getAppName() + " get icon : " + pck.getIcon());
+			Log.i(TAG," id : "+ pck.getId() + " package extracted :" + pck.getPackage() + " application name :  " + pck.getAppName() + " get icon : " + pck.getIcon() + " get Notify "+ pck.getCanNotify());
 		}
 	}
 	

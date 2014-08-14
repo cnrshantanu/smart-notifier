@@ -18,7 +18,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	private final String TAG = "DataBaseHelper";
 	
 	public static final int DATABASE_VERSION = 1;
-	public static final String DATABASE_NAME = "test2.db";
+	public static final String DATABASE_NAME = "test.db";//test2.db
 
 	public static abstract class PackageEntry {
 		private static final String KEY_ID = "id";
@@ -26,9 +26,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		public static final String COLUMN_NAME_PACKAGE_NAME = "package";
 		public static final String COLUMN_NAME_APP = "name";
 		public static final String COLUMN_NAME_ICON = "icon";
+		public static final String COLUNM_NOTIFY	= "notify";
 	}
 
 	private static final String TEXT_TYPE = " TEXT";
+	private static final String BOOLEAN_TYPE = " BOOLEAN";
 	private static final String COMMA_SEP = ",";
 	private String[] allColumns = { PackageEntry.KEY_ID,
 			PackageEntry.COLUMN_NAME_PACKAGE_NAME,
@@ -38,7 +40,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			+ " INTEGER PRIMARY KEY AUTOINCREMENT,"
 			+ PackageEntry.COLUMN_NAME_PACKAGE_NAME + TEXT_TYPE + COMMA_SEP
 			+ PackageEntry.COLUMN_NAME_APP + TEXT_TYPE + COMMA_SEP
-			+ PackageEntry.COLUMN_NAME_ICON + TEXT_TYPE + " )";
+			+ PackageEntry.COLUMN_NAME_ICON + TEXT_TYPE +COMMA_SEP
+			+ PackageEntry.COLUNM_NOTIFY + BOOLEAN_TYPE +" )";
 
 	private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
 			+ PackageEntry.TABLE_NAME;
@@ -72,7 +75,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			values.put(PackageEntry.COLUMN_NAME_PACKAGE_NAME, p.getPackage());
 			values.put(PackageEntry.COLUMN_NAME_APP, p.getAppName());
 			values.put(PackageEntry.COLUMN_NAME_ICON, p.getIcon());
+			values.put(PackageEntry.COLUNM_NOTIFY, p.getCanNotify());
 			db.insert(PackageEntry.TABLE_NAME, null, values);
+			
 			db.close();
 		} else {
 			p.setId(temp_id);
@@ -133,6 +138,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		pck.setPackage(cursor.getString(1));
 		pck.setSetAppName(cursor.getString(2));
 		pck.setIcon(cursor.getString(3));
+		//Log.d("ls"," adding boolean " + cursor.get(4));
 		return pck;
 	}
 }
