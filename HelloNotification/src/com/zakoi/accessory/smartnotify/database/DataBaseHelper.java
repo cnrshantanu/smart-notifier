@@ -30,18 +30,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	}
 
 	private static final String TEXT_TYPE = " TEXT";
-	private static final String BOOLEAN_TYPE = " BOOLEAN";
+	private static final String BOOLEAN_TYPE = " INTEGER";
 	private static final String COMMA_SEP = ",";
 	private String[] allColumns = { PackageEntry.KEY_ID,
 			PackageEntry.COLUMN_NAME_PACKAGE_NAME,
-			PackageEntry.COLUMN_NAME_APP, PackageEntry.COLUMN_NAME_ICON };
+			PackageEntry.COLUMN_NAME_APP, PackageEntry.COLUMN_NAME_ICON, PackageEntry.COLUNM_NOTIFY };
 	private static final String SQL_CREATE_ENTRIES = "CREATE TABLE "
 			+ PackageEntry.TABLE_NAME + " (" + PackageEntry.KEY_ID
 			+ " INTEGER PRIMARY KEY AUTOINCREMENT,"
 			+ PackageEntry.COLUMN_NAME_PACKAGE_NAME + TEXT_TYPE + COMMA_SEP
 			+ PackageEntry.COLUMN_NAME_APP + TEXT_TYPE + COMMA_SEP
 			+ PackageEntry.COLUMN_NAME_ICON + TEXT_TYPE +COMMA_SEP
-			+ PackageEntry.COLUNM_NOTIFY + BOOLEAN_TYPE +" )";
+			+ PackageEntry.COLUNM_NOTIFY + BOOLEAN_TYPE + " DEFAULT 0"+" )";
 
 	private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
 			+ PackageEntry.TABLE_NAME;
@@ -75,7 +75,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			values.put(PackageEntry.COLUMN_NAME_PACKAGE_NAME, p.getPackage());
 			values.put(PackageEntry.COLUMN_NAME_APP, p.getAppName());
 			values.put(PackageEntry.COLUMN_NAME_ICON, p.getIcon());
-			values.put(PackageEntry.COLUNM_NOTIFY, p.getCanNotify());
+			if(p.getCanNotify())
+				values.put(PackageEntry.COLUNM_NOTIFY,1);
+			else
+				values.put(PackageEntry.COLUNM_NOTIFY,0);
 			db.insert(PackageEntry.TABLE_NAME, null, values);
 			
 			db.close();
@@ -86,9 +89,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 	}
 
-	public void getPackage(int id) {
-
-	}
 
 	private long getPackageId(String package_name) {
 		String query = "Select * FROM " + PackageEntry.TABLE_NAME + " WHERE "
@@ -138,7 +138,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		pck.setPackage(cursor.getString(1));
 		pck.setSetAppName(cursor.getString(2));
 		pck.setIcon(cursor.getString(3));
-		//Log.d("ls"," adding boolean " + cursor.get(4));
+		if(cursor.getInt(4) == 1)
+			pck.setCanNotify(true);
+		else
+			pck.setCanNotify(false);
 		return pck;
 	}
 }

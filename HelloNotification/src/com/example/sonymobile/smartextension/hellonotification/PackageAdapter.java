@@ -16,12 +16,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zakoi.accessory.smartnotify.receiver.PackageDataModel;
+import com.zakoi.accessory.smartnotify.receiver.PackageGrabber;
 
 public class PackageAdapter extends ArrayAdapter<PackageDataModel> {
 
 	private List<PackageDataModel> m_packageList = new ArrayList<PackageDataModel>();
 	private int m_resource;
 	private Context m_context;
+	private static PackageGrabber m_packageGrabber;
 	private final String TAG = "Package Adapter";
 
 	public PackageAdapter(Context context, int resource,
@@ -31,6 +33,7 @@ public class PackageAdapter extends ArrayAdapter<PackageDataModel> {
 		m_packageList = objects;
 		m_resource = resource;
 		m_context = context;
+		//m_packageGrabber = new PackageGrabber(m_context);
 	}
 
 	@Override
@@ -53,6 +56,7 @@ public class PackageAdapter extends ArrayAdapter<PackageDataModel> {
 		     public void onClick(View v) { 
 		      CheckBox cb = (CheckBox) v ;
 		      currentPackage.setCanNotify(cb.isChecked());
+		      //m_packageGrabber.addPackage(currentPackage);
 		      Log.d(TAG,currentPackage.getAppName());
 		      
 		     }

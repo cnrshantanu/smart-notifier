@@ -102,8 +102,8 @@ public class PackageGrabber {
 		}.execute(null, null, null);
 	}
 	
-	void addPackage() {
-		
+	public void addPackage(PackageDataModel l_package) {
+		m_packageDB.addPackage(l_package);
 	}
 	void printPackagesFromDB() {
 		Log.i(TAG, "Reading all applications."); 
