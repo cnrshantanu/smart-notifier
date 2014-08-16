@@ -31,6 +31,7 @@ import com.example.sonymobile.smartextension.hellonotification.HelloNotification
 import com.example.sonymobile.smartextension.hellonotification.R;
 import com.sonyericsson.extras.liveware.extension.util.ExtensionUtils;
 import com.sonyericsson.extras.liveware.extension.util.notification.NotificationUtil;
+import com.zakoi.accessory.smartnotify.database.DataBaseHelper;
 
 /**
  * This service class catches Toast or Notification of applications
@@ -42,6 +43,7 @@ public class MyAccessibilityService extends AccessibilityService {
 
 	private final AccessibilityServiceInfo info = new AccessibilityServiceInfo();
 	private static final String TAG = "MyAccessibilityService";
+	private DataBaseHelper m_packageDB;
 
 	@Override
 	public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -143,11 +145,19 @@ public class MyAccessibilityService extends AccessibilityService {
 		// info.flags = AccessibilityServiceInfo.DEFAULT;
 
 		info.notificationTimeout = 100;
-
+		m_packageDB = new DataBaseHelper(this);
 		this.setServiceInfo(info);
 	}
 
 	public void addData(String package_name, String heading, String message) {
+		
+		int notifyStatus = m_packageDB.getPackageNotify(package_name);
+		if(notifyStatus != 1)
+		{
+			Log.d(TAG,"received notification but rejected it for" + package_name);
+			return;
+		}
+			
 		long time = System.currentTimeMillis();
 		long sourceId = NotificationUtil.getSourceId(this,
 				HelloNotificationExtensionService.EXTENSION_SPECIFIC_ID);
@@ -184,6 +194,7 @@ public class MyAccessibilityService extends AccessibilityService {
 			eventValues.put(Notification.EventColumns.PUBLISHED_TIME, time);
 			eventValues.put(Notification.EventColumns.SOURCE_ID, sourceId);
 			NotificationUtil.addEvent(this, eventValues);
+			Log.d(TAG, "sent notification for :" + package_name);
 		} catch (Exception e) {
 			Log.d(TAG, "could not load details");
 		}
