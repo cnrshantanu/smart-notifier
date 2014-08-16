@@ -104,7 +104,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			return -1;
 	}
 	
-	private int getPackageNotify(String package_name) {
+	public int getPackageNotify(String package_name) {
 		String query = "Select * FROM " + PackageEntry.TABLE_NAME + " WHERE "
 				+ PackageEntry.COLUMN_NAME_PACKAGE_NAME + " =  \""
 				+ package_name + "\"";

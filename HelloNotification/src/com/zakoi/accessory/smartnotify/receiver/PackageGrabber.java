@@ -92,11 +92,17 @@ public class PackageGrabber {
 					final ArrayList<PackageDataModel> result) {
 				m_packageList = result;
 				final int max = m_packageList.size();
-				/*for (int i = 0; i < max; i++) {
-					m_packageDB.addPackage(m_packageList.get(i));
+				for (int i = 0; i < max; i++) {
+					int notifyStatus = m_packageDB.getPackageNotify(m_packageList.get(i).getPackage());
+					if(notifyStatus == 1)
+						m_packageList.get(i).setCanNotify(true);
+					else
+						m_packageList.get(i).setCanNotify(false);
+					
+					//m_packageDB.addPackage(m_packageList.get(i));
 					
 					//m_packageList.get(i).prettyPrint();
-				}*/
+				}
 				printPackagesFromDB();
 			}
 		}.execute(null, null, null);
