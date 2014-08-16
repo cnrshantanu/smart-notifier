@@ -65,7 +65,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		onUpgrade(db, oldVersion, newVersion);
 	}
-
+	
 	public void addPackage(PackageDataModel p) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
@@ -83,6 +83,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			
 			db.close();
 		} else {
+			Log.d(TAG, " Added package with notify " + p.getCanNotify());
 			p.setId(temp_id);
 			updatePackage(p);
 		}
@@ -102,7 +103,20 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		} else
 			return -1;
 	}
+	
+	private int getPackageNotify(String package_name) {
+		String query = "Select * FROM " + PackageEntry.TABLE_NAME + " WHERE "
+				+ PackageEntry.COLUMN_NAME_PACKAGE_NAME + " =  \""
+				+ package_name + "\"";
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(query, null);
 
+		if (cursor.moveToFirst()) {
+			return cursor.getInt(4);
+		} else
+			return -1;
+	}
+	
 	public List<PackageDataModel> getAllPackages() {
 		SQLiteDatabase db = this.getReadableDatabase();
 		List<PackageDataModel> temp = new ArrayList<PackageDataModel>();
@@ -123,6 +137,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		values.put(PackageEntry.COLUMN_NAME_PACKAGE_NAME, p.getPackage());
 		values.put(PackageEntry.COLUMN_NAME_APP, p.getAppName());
 		values.put(PackageEntry.COLUMN_NAME_ICON, p.getIcon());
+		if(p.getCanNotify())
+			values.put(PackageEntry.COLUNM_NOTIFY,1);
+		else
+			values.put(PackageEntry.COLUNM_NOTIFY,0);
 
 		return db.update(PackageEntry.TABLE_NAME, values, PackageEntry.KEY_ID
 				+ " = ?", new String[] { String.valueOf(p.getId()) });

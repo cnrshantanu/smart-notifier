@@ -92,11 +92,11 @@ public class PackageGrabber {
 					final ArrayList<PackageDataModel> result) {
 				m_packageList = result;
 				final int max = m_packageList.size();
-				for (int i = 0; i < max; i++) {
+				/*for (int i = 0; i < max; i++) {
 					m_packageDB.addPackage(m_packageList.get(i));
 					
 					//m_packageList.get(i).prettyPrint();
-				}
+				}*/
 				printPackagesFromDB();
 			}
 		}.execute(null, null, null);
@@ -105,7 +105,7 @@ public class PackageGrabber {
 	public void addPackage(PackageDataModel l_package) {
 		m_packageDB.addPackage(l_package);
 	}
-	void printPackagesFromDB() {
+	public void printPackagesFromDB() {
 		Log.i(TAG, "Reading all applications."); 
 		List<PackageDataModel> package_list = m_packageDB.getAllPackages();
 		

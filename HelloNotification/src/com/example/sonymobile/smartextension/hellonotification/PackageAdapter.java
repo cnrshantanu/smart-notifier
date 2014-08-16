@@ -33,7 +33,7 @@ public class PackageAdapter extends ArrayAdapter<PackageDataModel> {
 		m_packageList = objects;
 		m_resource = resource;
 		m_context = context;
-		//m_packageGrabber = new PackageGrabber(m_context);
+		m_packageGrabber = new PackageGrabber(m_context);
 	}
 
 	@Override
@@ -56,8 +56,9 @@ public class PackageAdapter extends ArrayAdapter<PackageDataModel> {
 		     public void onClick(View v) { 
 		      CheckBox cb = (CheckBox) v ;
 		      currentPackage.setCanNotify(cb.isChecked());
-		      //m_packageGrabber.addPackage(currentPackage);
-		      Log.d(TAG,currentPackage.getAppName());
+		      m_packageGrabber.addPackage(currentPackage);
+		      Log.d(TAG,"Adding checkbox in "+ currentPackage.getAppName());
+		      m_packageGrabber.printPackagesFromDB();
 		      
 		     }
 		 });
