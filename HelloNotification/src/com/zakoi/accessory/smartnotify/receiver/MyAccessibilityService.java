@@ -64,11 +64,11 @@ public class MyAccessibilityService extends AccessibilityService {
 						temp_notificationMsg += messages.get(i).toString();
 					}
 					final String notificationMsg = temp_notificationMsg;
-					Log.v(TAG, "Captured notification message ["
+					/*Log.v(TAG, "Captured notification message ["
 							+ notificationMsg + "] for source ["
 							+ sourcePackageName + "]");
 					Log.v(TAG, "Broadcasting for "
-							+ Constants.ACTION_CATCH_NOTIFICATION);
+							+ Constants.ACTION_CATCH_NOTIFICATION);*/
 
 					android.app.Notification m_notify = (android.app.Notification) event
 							.getParcelableData();

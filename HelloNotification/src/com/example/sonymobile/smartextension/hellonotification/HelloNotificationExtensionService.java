@@ -43,6 +43,7 @@ import com.sonyericsson.extras.liveware.aef.registration.Registration;
 import com.sonyericsson.extras.liveware.extension.util.ExtensionService;
 import com.sonyericsson.extras.liveware.extension.util.registration.DeviceInfoHelper;
 import com.sonyericsson.extras.liveware.extension.util.registration.RegistrationInformation;
+import com.zakoi.accessory.smartnotify.database.DataBaseHelper;
 
 /**
  * The sample extension service handles extension registration and inserts data
@@ -50,106 +51,160 @@ import com.sonyericsson.extras.liveware.extension.util.registration.Registration
  */
 public class HelloNotificationExtensionService extends ExtensionService {
 
-    /** Extension specific id for the source. */
-    public static final String EXTENSION_SPECIFIC_ID = "EXTENSION_SPECIFIC_ID_SAMPLE_NOTIFICATION";
+	/** Extension specific id for the source. */
+	public static final String EXTENSION_SPECIFIC_ID = "EXTENSION_SPECIFIC_ID_SAMPLE_NOTIFICATION";
 
-    public static final String LOG_TAG = "HelloNotification";
+	public static final String LOG_TAG = "HelloNotification";
+	private DataBaseHelper m_packageDB;
 
-    public HelloNotificationExtensionService() {
-        super();
-    }
+	public HelloNotificationExtensionService() {
+		super();
+	}
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.d(LOG_TAG, "onCreate: HelloNotificationExtensionService");
-    }
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		m_packageDB = new DataBaseHelper(this);
+		Log.d(LOG_TAG, "onCreate: HelloNotificationExtensionService");
+	}
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
-    }
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		return super.onStartCommand(intent, flags, startId);
+	}
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "onDestroy: HelloNotificationExtensionService");
-    }
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		Log.d(LOG_TAG, "onDestroy: HelloNotificationExtensionService");
+	}
 
-    @Override
-    protected void onViewEvent(Intent intent) {
-        String action = intent.getStringExtra(Notification.Intents.EXTRA_ACTION);
-        String hostAppPackageName = intent
-                .getStringExtra(Registration.Intents.EXTRA_AHA_PACKAGE_NAME);
-        boolean advancedFeaturesSupported = DeviceInfoHelper.isSmartWatch2ApiAndScreenDetected(
-                this, hostAppPackageName);
+	@Override
+	protected void onViewEvent(Intent intent) {
+		String action = intent
+				.getStringExtra(Notification.Intents.EXTRA_ACTION);
+		String hostAppPackageName = intent
+				.getStringExtra(Registration.Intents.EXTRA_AHA_PACKAGE_NAME);
+		boolean advancedFeaturesSupported = DeviceInfoHelper
+				.isSmartWatch2ApiAndScreenDetected(this, hostAppPackageName);
 
-        // Determine what item a user tapped in the options menu and take
-        // appropriate action.
-        int eventId = intent.getIntExtra(Notification.Intents.EXTRA_EVENT_ID, -1);
-        if (Notification.SourceColumns.ACTION_1.equals(action)) {
-            doAction1(eventId);
-        } else if (Notification.SourceColumns.ACTION_2.equals(action)) {
-            // Here we can take different actions depending on the accessory.
-            if (advancedFeaturesSupported) {
-                Toast.makeText(this, "Action 2 API level 2", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "Action 2", Toast.LENGTH_LONG).show();
-            }
-        } else if (Notification.SourceColumns.ACTION_3.equals(action)) {
-            Toast.makeText(this, "Action 3", Toast.LENGTH_LONG).show();
-        }
-    }
+		// Determine what item a user tapped in the options menu and take
+		// appropriate action.
+		int eventId = intent.getIntExtra(Notification.Intents.EXTRA_EVENT_ID,
+				-1);
+		if (Notification.SourceColumns.ACTION_1.equals(action)) {
+			doAction(eventId);
+		} else if (Notification.SourceColumns.ACTION_2.equals(action)) {
+			// Here we can take different actions depending on the accessory.
+			if (advancedFeaturesSupported) {
+				Toast.makeText(this, "Action 2 API level 2", Toast.LENGTH_LONG)
+						.show();
+			} else {
+				Toast.makeText(this, "Action 2", Toast.LENGTH_LONG).show();
+			}
+		} else if (Notification.SourceColumns.ACTION_3.equals(action)) {
+			Toast.makeText(this, "Action 3", Toast.LENGTH_LONG).show();
+		}
+	}
 
-    @Override
-    protected void onRefreshRequest() {
-        // Do nothing. Only relevant for polling extensions.
-    }
+	@Override
+	protected void onRefreshRequest() {
+		// Do nothing. Only relevant for polling extensions.
+	}
 
-    /**
-     * Shows a toast on the phone with the information associated with an
-     * event.
-     *
-     * @param eventId The event id
-     */
-    public void doAction1(int eventId) {
-        Log.d(LOG_TAG, "doAction1 event id: " + eventId);
-        Cursor cursor = null;
-        try {
-            String name = "";
-            String message = "";
-            cursor = getContentResolver().query(Notification.Event.URI, null,
-                    Notification.EventColumns._ID + " = " + eventId, null, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                int nameIndex = cursor.getColumnIndex(Notification.EventColumns.DISPLAY_NAME);
-                int messageIndex = cursor.getColumnIndex(Notification.EventColumns.MESSAGE);
-                name = cursor.getString(nameIndex);
-                message = cursor.getString(messageIndex);
-            }
+	/**
+	 * Shows a toast on the phone with the information associated with an event.
+	 * 
+	 * @param eventId
+	 *            The event id
+	 */
+	public void doAction(int eventId) {
+		Log.d(LOG_TAG, "doAction1 event id: " + eventId);
+		Cursor cursor = null;
+		try {
+			String Appname = "";
+			String message = "";
+			long id = -1;
+			cursor = getContentResolver()
+					.query(Notification.Event.URI, null,
+							Notification.EventColumns._ID + " = " + eventId,
+							null, null);
+			if (cursor != null && cursor.moveToFirst()) {
+				int nameIndex = cursor
+						.getColumnIndex(Notification.EventColumns.DISPLAY_NAME);
+				int messageIndex = cursor
+						.getColumnIndex(Notification.EventColumns.MESSAGE);
+				Appname = cursor.getString(nameIndex);
+				message = cursor.getString(messageIndex);
+				
+				id = m_packageDB.getPackageIdfromAppName(Appname);
+				//this.getPackageManager().
+			}
+			
+			String toastMessage = getText(R.string.action_event_1)
+					+ ", Event: " + eventId + ", Name: " + Appname + ", id :"+ id + ", Message: "
+					+ message;
+			Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+			
+			
+			
+			
+		} catch (SQLException e) {
+			Log.e(LOG_TAG, "Failed to query event", e);
+		} catch (SecurityException e) {
+			Log.e(LOG_TAG, "Failed to query event", e);
+		} catch (IllegalArgumentException e) {
+			Log.e(LOG_TAG, "Failed to query event", e);
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+	}
 
-            String toastMessage = getText(R.string.action_event_1) + ", Event: " + eventId
-                    + ", Name: " + name + ", Message: " + message;
-            Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
-        } catch (SQLException e) {
-            Log.e(LOG_TAG, "Failed to query event", e);
-        } catch (SecurityException e) {
-            Log.e(LOG_TAG, "Failed to query event", e);
-        } catch (IllegalArgumentException e) {
-            Log.e(LOG_TAG, "Failed to query event", e);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
+	public void doAction1(int eventId) {
+		Log.d(LOG_TAG, "doAction1 event id: " + eventId);
+		Cursor cursor = null;
+		try {
+			String name = "";
+			String message = "";
+			cursor = getContentResolver()
+					.query(Notification.Event.URI, null,
+							Notification.EventColumns._ID + " = " + eventId,
+							null, null);
+			if (cursor != null && cursor.moveToFirst()) {
+				int nameIndex = cursor
+						.getColumnIndex(Notification.EventColumns.DISPLAY_NAME);
+				int messageIndex = cursor
+						.getColumnIndex(Notification.EventColumns.MESSAGE);
+				name = cursor.getString(nameIndex);
+				message = cursor.getString(messageIndex);
+			}
 
-    @Override
-    protected RegistrationInformation getRegistrationInformation() {
-        return new HelloNotificationRegistrationInformation(this);
-    }
+			String toastMessage = getText(R.string.action_event_1)
+					+ ", Event: " + eventId + ", Name: " + name + ", Message: "
+					+ message;
+			Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+		} catch (SQLException e) {
+			Log.e(LOG_TAG, "Failed to query event", e);
+		} catch (SecurityException e) {
+			Log.e(LOG_TAG, "Failed to query event", e);
+		} catch (IllegalArgumentException e) {
+			Log.e(LOG_TAG, "Failed to query event", e);
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+	}
 
-    @Override
-    protected boolean keepRunningWhenConnected() {
-        return false;
-    }
+	@Override
+	protected RegistrationInformation getRegistrationInformation() {
+		return new HelloNotificationRegistrationInformation(this);
+	}
+
+	@Override
+	protected boolean keepRunningWhenConnected() {
+		return false;
+	}
 }

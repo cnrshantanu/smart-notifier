@@ -90,7 +90,19 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 	}
 
+	public long getPackageIdfromAppName(String appName){
+		String query = "Select * FROM " + PackageEntry.TABLE_NAME + " WHERE "
+				+ PackageEntry.COLUMN_NAME_APP + " =  \""
+				+ appName + "\"";
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(query, null);
 
+		if (cursor.moveToFirst()) {
+			return Long.parseLong(cursor.getString(0));
+		} else
+			return -1;
+	}
+	
 	private long getPackageId(String package_name) {
 		String query = "Select * FROM " + PackageEntry.TABLE_NAME + " WHERE "
 				+ PackageEntry.COLUMN_NAME_PACKAGE_NAME + " =  \""
