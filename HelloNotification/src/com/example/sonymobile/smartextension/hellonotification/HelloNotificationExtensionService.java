@@ -32,6 +32,8 @@ Copyright (c) 2011-2013, Sony Mobile Communications AB
 
 package com.example.sonymobile.smartextension.hellonotification;
 
+import java.util.Calendar;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -44,6 +46,7 @@ import com.sonyericsson.extras.liveware.extension.util.ExtensionService;
 import com.sonyericsson.extras.liveware.extension.util.registration.DeviceInfoHelper;
 import com.sonyericsson.extras.liveware.extension.util.registration.RegistrationInformation;
 import com.zakoi.accessory.smartnotify.database.DataBaseHelper;
+import com.zakoi.accessory.smartnotify.receiver.PackageDataModel;
 
 /**
  * The sample extension service handles extension registration and inserts data
@@ -103,6 +106,7 @@ public class HelloNotificationExtensionService extends ExtensionService {
 				Toast.makeText(this, "Action 2", Toast.LENGTH_LONG).show();
 			}
 		} else if (Notification.SourceColumns.ACTION_3.equals(action)) {
+
 			Toast.makeText(this, "Action 3", Toast.LENGTH_LONG).show();
 		}
 	}
@@ -136,19 +140,19 @@ public class HelloNotificationExtensionService extends ExtensionService {
 						.getColumnIndex(Notification.EventColumns.MESSAGE);
 				Appname = cursor.getString(nameIndex);
 				message = cursor.getString(messageIndex);
+
+				PackageDataModel temp = m_packageDB
+						.getPackageModelfromAppName(Appname);
+				temp.resetMute(1);
+				m_packageDB.updatePackage(temp);
 				
-				id = m_packageDB.getPackageIdfromAppName(Appname);
-				//this.getPackageManager().
 			}
-			
+
 			String toastMessage = getText(R.string.action_event_1)
-					+ ", Event: " + eventId + ", Name: " + Appname + ", id :"+ id + ", Message: "
-					+ message;
+					+ ", Event: " + eventId + ", Name: " + Appname + ", id :"
+					+ id + ", Message: " + message;
 			Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
-			
-			
-			
-			
+
 		} catch (SQLException e) {
 			Log.e(LOG_TAG, "Failed to query event", e);
 		} catch (SecurityException e) {

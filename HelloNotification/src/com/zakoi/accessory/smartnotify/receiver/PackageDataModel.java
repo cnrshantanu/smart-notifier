@@ -5,7 +5,9 @@ import android.util.Log;
 
 public class PackageDataModel {
 
+	
 	long id;
+	int mute = -1;
 	String appname = "";
 	String pname = "";
 	String versionName = "";
@@ -13,7 +15,25 @@ public class PackageDataModel {
 	int versionCode = 0;
 	Boolean canNotify = false;
 	String TAG = "Package Model";
+	public TimeKeeper start_time;
 
+	public PackageDataModel() {
+		start_time = new TimeKeeper();
+	}
+	public void resetMute() {
+		mute = -1;
+	}
+	
+	public void resetMute(int mute_mode) {
+		mute = mute_mode;
+		if(mute_mode == 1)
+			start_time.setTime();
+	}
+	
+	public int getMuteMode() {
+		return mute;
+	}
+	
 	public Boolean getCanNotify() {
 		return canNotify;
 	}

@@ -216,7 +216,7 @@ public class HelloNotificationPreferenceActivity extends PreferenceActivity {
 	/**
 	 * Clears all notifications.
 	 */
-	private class ClearEventsTask extends AsyncTask<Void, Void, Integer> {
+	public class ClearEventsTask extends AsyncTask<Void, Void, Integer> {
 
 		@Override
 		protected void onPreExecute() {

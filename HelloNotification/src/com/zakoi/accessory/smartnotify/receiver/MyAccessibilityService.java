@@ -166,7 +166,16 @@ public class MyAccessibilityService extends AccessibilityService {
 					"Failed to insert data");
 			return;
 		}
-
+		
+		PackageDataModel temp = m_packageDB.getPackageModel(package_name);
+		Log.d(TAG,"received notification mute mode " + temp.getMuteMode() + " 5 min count " + temp.start_time.is5MinuteOver());
+		if(temp.getMuteMode() == 1) {
+			if(!temp.start_time.is5MinuteOver()) {
+				
+				return;
+			
+			}
+		}
 		try {
 
 			String profileImage;
