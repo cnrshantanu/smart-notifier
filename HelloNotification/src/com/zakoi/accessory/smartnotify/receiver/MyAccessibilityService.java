@@ -173,7 +173,9 @@ public class MyAccessibilityService extends AccessibilityService {
 			if(!temp.start_time.is5MinuteOver()) {
 				
 				return;
-			
+			} else {
+				temp.resetMute();
+				m_packageDB.updatePackage(temp);
 			}
 		}
 		try {

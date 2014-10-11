@@ -32,17 +32,17 @@ Copyright (c) 2011-2013, Sony Mobile Communications AB
 
 package com.example.sonymobile.smartextension.hellonotification;
 
-import java.util.Calendar;
-
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.sonyericsson.extras.liveware.aef.notification.Notification;
 import com.sonyericsson.extras.liveware.aef.registration.Registration;
 import com.sonyericsson.extras.liveware.extension.util.ExtensionService;
+import com.sonyericsson.extras.liveware.extension.util.notification.NotificationUtil;
 import com.sonyericsson.extras.liveware.extension.util.registration.DeviceInfoHelper;
 import com.sonyericsson.extras.liveware.extension.util.registration.RegistrationInformation;
 import com.zakoi.accessory.smartnotify.database.DataBaseHelper;
@@ -96,18 +96,11 @@ public class HelloNotificationExtensionService extends ExtensionService {
 		int eventId = intent.getIntExtra(Notification.Intents.EXTRA_EVENT_ID,
 				-1);
 		if (Notification.SourceColumns.ACTION_1.equals(action)) {
-			doAction(eventId);
+			mutefor5mins(eventId);
 		} else if (Notification.SourceColumns.ACTION_2.equals(action)) {
-			// Here we can take different actions depending on the accessory.
-			if (advancedFeaturesSupported) {
-				Toast.makeText(this, "Action 2 API level 2", Toast.LENGTH_LONG)
-						.show();
-			} else {
-				Toast.makeText(this, "Action 2", Toast.LENGTH_LONG).show();
-			}
+			mutePackage(eventId);
 		} else if (Notification.SourceColumns.ACTION_3.equals(action)) {
-
-			Toast.makeText(this, "Action 3", Toast.LENGTH_LONG).show();
+			new ClearEventsTask().execute();
 		}
 	}
 
@@ -122,13 +115,11 @@ public class HelloNotificationExtensionService extends ExtensionService {
 	 * @param eventId
 	 *            The event id
 	 */
-	public void doAction(int eventId) {
-		Log.d(LOG_TAG, "doAction1 event id: " + eventId);
+	public void mutefor5mins(int eventId) {
+		Log.d(LOG_TAG, "mutefor 5 mins event id: " + eventId);
 		Cursor cursor = null;
 		try {
 			String Appname = "";
-			String message = "";
-			long id = -1;
 			cursor = getContentResolver()
 					.query(Notification.Event.URI, null,
 							Notification.EventColumns._ID + " = " + eventId,
@@ -136,23 +127,12 @@ public class HelloNotificationExtensionService extends ExtensionService {
 			if (cursor != null && cursor.moveToFirst()) {
 				int nameIndex = cursor
 						.getColumnIndex(Notification.EventColumns.DISPLAY_NAME);
-				int messageIndex = cursor
-						.getColumnIndex(Notification.EventColumns.MESSAGE);
 				Appname = cursor.getString(nameIndex);
-				message = cursor.getString(messageIndex);
-
 				PackageDataModel temp = m_packageDB
 						.getPackageModelfromAppName(Appname);
 				temp.resetMute(1);
 				m_packageDB.updatePackage(temp);
-				
 			}
-
-			String toastMessage = getText(R.string.action_event_1)
-					+ ", Event: " + eventId + ", Name: " + Appname + ", id :"
-					+ id + ", Message: " + message;
-			Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
-
 		} catch (SQLException e) {
 			Log.e(LOG_TAG, "Failed to query event", e);
 		} catch (SecurityException e) {
@@ -166,12 +146,11 @@ public class HelloNotificationExtensionService extends ExtensionService {
 		}
 	}
 
-	public void doAction1(int eventId) {
-		Log.d(LOG_TAG, "doAction1 event id: " + eventId);
+	public void mutePackage(int eventId) {
+		Log.d(LOG_TAG, "mutefor 5 mins event id: " + eventId);
 		Cursor cursor = null;
 		try {
-			String name = "";
-			String message = "";
+			String Appname = "";
 			cursor = getContentResolver()
 					.query(Notification.Event.URI, null,
 							Notification.EventColumns._ID + " = " + eventId,
@@ -179,16 +158,12 @@ public class HelloNotificationExtensionService extends ExtensionService {
 			if (cursor != null && cursor.moveToFirst()) {
 				int nameIndex = cursor
 						.getColumnIndex(Notification.EventColumns.DISPLAY_NAME);
-				int messageIndex = cursor
-						.getColumnIndex(Notification.EventColumns.MESSAGE);
-				name = cursor.getString(nameIndex);
-				message = cursor.getString(messageIndex);
+				Appname = cursor.getString(nameIndex);
+				PackageDataModel temp = m_packageDB
+						.getPackageModelfromAppName(Appname);
+				temp.setCanNotify(false);
+				m_packageDB.updatePackage(temp);
 			}
-
-			String toastMessage = getText(R.string.action_event_1)
-					+ ", Event: " + eventId + ", Name: " + name + ", Message: "
-					+ message;
-			Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
 		} catch (SQLException e) {
 			Log.e(LOG_TAG, "Failed to query event", e);
 		} catch (SecurityException e) {
@@ -210,5 +185,31 @@ public class HelloNotificationExtensionService extends ExtensionService {
 	@Override
 	protected boolean keepRunningWhenConnected() {
 		return false;
+	}
+
+	public class ClearEventsTask extends AsyncTask<Void, Void, Integer> {
+
+		@Override
+		protected void onPreExecute() {
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+			int nbrDeleted = 0;
+			nbrDeleted = NotificationUtil
+					.deleteAllEvents(HelloNotificationExtensionService.this);
+			return nbrDeleted;
+		}
+
+		@Override
+		protected void onPostExecute(Integer id) {
+			if (id != NotificationUtil.INVALID_ID) {
+				Toast.makeText(HelloNotificationExtensionService.this,
+						R.string.clear_success, Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(HelloNotificationExtensionService.this,
+						R.string.clear_failure, Toast.LENGTH_SHORT).show();
+			}
+		}
 	}
 }
